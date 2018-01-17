@@ -2,7 +2,7 @@
 Quick Rename is a Python based file renaming tool.
 
 ## Interface Images:
-!["Example Image"](/images/preview.JPG)
+!["Example Image"](preview.JPG)
 
 ## Usage Requirements:
 This application requires that you have PyQt5 installed on your system. It was written utilizing Python 3.62 but should be reverse compatable for the most part.
