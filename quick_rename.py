@@ -1,5 +1,5 @@
 #!/usr/bin/python36
-# Verision 1.0
+# Version 1.0
 # Author: Walter Behrnes
 # Description:
 #       File Renaming utility
@@ -78,17 +78,17 @@ class CustomTable(QTableView):
         # The QTableWidget from which selected rows will be moved
         sender = event.source()
         # GET ROW BEING DROPPED
-        dropRow = self.model.itemFromIndex(self.indexAt(event.pos())).row()
+        drop_row = self.model.itemFromIndex(self.indexAt(event.pos())).row()
         # GET SELECTED ITEMS
-        selectedItems = sender.get_selected_items()
+        selected_items = sender.get_selected_items()
         # MOVE ITEM
-        for data in selectedItems:
+        for data in selected_items:
             if data.text():
                 checked = data.checkState()
                 new_item = QStandardItem(data.text())
                 new_item.setCheckState(checked)
                 new_item.setCheckable(True)
-                self.model.insertRow(dropRow, new_item)
+                self.model.insertRow(drop_row, new_item)
         event.accept()
 
     def get_selected_items(self):
@@ -106,6 +106,7 @@ class CustomTable(QTableView):
 
         selected_rows.sort()
         return selected_rows
+
 
 class QuickRename(QWidget):
 
@@ -125,27 +126,48 @@ class QuickRename(QWidget):
         self.main_layout = QVBoxLayout()
         self.file_view = QHBoxLayout()
         self.process_view = QHBoxLayout()
+        self.limit_view = QCheckBox("Limit file type")
+        self.limit_type = QLineEdit(self._defaults['file_type'])
+        self.search = QCheckBox("Limit file text")
+        self.search_text = QLineEdit(self._defaults['search_str'])
+        self.files = CustomTable()
+        self.base_dir = QLineEdit(self._defaults['select_dir'])
+        self.file_browser = QPushButton("Open Directory")
+        self.refresh = QPushButton("Refresh")
+        self.add_prefix = QCheckBox("Add prefix:")
+        self.prefix = QLineEdit(self._defaults['prefix'])
+        self.complete_rename = QCheckBox("Complete Rename:")
+        self.new_name = QLineEdit(self._defaults['new_name'])
+        self.search_and_replace = QCheckBox("Search / Replace:")
+        self.find = QLineEdit(self._defaults['search_for'])
+        self.replace = QLineEdit(self._defaults['replace_with'])
+        self.renumber = QCheckBox("Renumber")
+        self.start_num = QSpinBox()
+        self.padding = QComboBox()
+        self.dot = QCheckBox("Use Dot numbering")
+        self.ext = QCheckBox("Remove Extension")
+        self.backup_files = QCheckBox("Backup Files")
+        self.preview_button = QPushButton("Preview")
+        self.rename_button = QPushButton("Rename")
         self.init_ui()
 
-    def add_display_otions_ui_elements(self):
+    def add_display_options_ui_elements(self):
         """
         method used to add the display options to the gui
         Returns:
              None
         """
         options_layout = QHBoxLayout()
-        self.limit_view = QCheckBox("Limit file type")
+
         self.limit_view.setToolTip("When checked only show parse type files")
         self.limit_view.toggled.connect(self.toggle_limit_view)
         self.limit_view.toggled.connect(self.get_files_from_selected_folder)
-        self.limit_type = QLineEdit(self._defaults['file_type'])
+
         self.limit_type.setDisabled(True)
         self.limit_type.setMaximumWidth(77)
         self.limit_type.editingFinished.connect(self.check_limit_type)
         self.limit_type.textEdited.connect(self.get_files_from_selected_folder)
 
-        self.search = QCheckBox("Limit file text")
-        self.search_text = QLineEdit(self._defaults['search_str'])
         self.search_text.setDisabled(True)
         self.search.toggled.connect(self.toggle_search)
         self.search.toggled.connect(self.get_files_from_selected_folder)
@@ -168,7 +190,6 @@ class QuickRename(QWidget):
         Returns:
             None
         """
-        self.files = CustomTable()
         self.files.clicked.connect(self.update_check_state)
         self.file_view.addWidget(self.files)
 
@@ -178,20 +199,15 @@ class QuickRename(QWidget):
         Returns:
             None
         """
-
         folder_layout = QHBoxLayout()
         label = QLabel("Files Location : ")
-        self.base_dir = QLineEdit(self._defaults['select_dir'])
         self.base_dir.setMinimumHeight(32)
-        self.file_browser = QPushButton("Open Directory")
         self.file_browser.clicked.connect(self.get_dir)
-        self.refresh = QPushButton("Refresh")
         self.refresh.clicked.connect(self.get_files_from_selected_folder)
         folder_layout.addWidget(label)
         folder_layout.addWidget(self.base_dir)
         folder_layout.addWidget(self.file_browser)
         folder_layout.addWidget(self.refresh)
-
         # ADD folder_layout TO self.main_layout
         self.main_layout.addLayout(folder_layout)
 
@@ -223,10 +239,10 @@ class QuickRename(QWidget):
         """
         rename_layout = QVBoxLayout()
         h_layout_1 = QHBoxLayout()
-        self.add_prefix = QCheckBox("Add prefix:")
+
         self.add_prefix.setToolTip("When checked add a prefix to the files being renamed")
         self.add_prefix.clicked.connect(self.toggle_add_prefix)
-        self.prefix = QLineEdit(self._defaults['prefix'])
+
         self.prefix.setDisabled(True)
         self.prefix.editingFinished.connect(self.check_prefix)
         self.prefix.setMaximumWidth(200)
@@ -236,10 +252,10 @@ class QuickRename(QWidget):
         rename_layout.addLayout(h_layout_1)
 
         h_layout_2 = QHBoxLayout()
-        self.complete_rename = QCheckBox("Complete Rename:")
+
         self.complete_rename.setToolTip("When checked the selected items will be completely renamed")
         self.complete_rename.clicked.connect(self.toggle_complete_rename)
-        self.new_name = QLineEdit(self._defaults['new_name'])
+
         self.new_name.setDisabled(True)
         self.new_name.editingFinished.connect(self.check_complete_rename)
         self.new_name.setMaximumWidth(200)
@@ -249,15 +265,15 @@ class QuickRename(QWidget):
         rename_layout.addLayout(h_layout_2)
 
         h_layout_3 = QHBoxLayout()
-        self.search_and_replace = QCheckBox("Search / Replace:")
+
         self.search_and_replace.setToolTip("When Checked search for a string of text and replace with a new string")
         self.search_and_replace.clicked.connect(self.toggle_search_and_replace)
-        self.find = QLineEdit(self._defaults['search_for'])
+
         self.find.setDisabled(True)
         self.find.editingFinished.connect(self.check_search_and_replace_name)
         self.find.setMinimumWidth(200)
         self.find.setMaximumWidth(200)
-        self.replace = QLineEdit(self._defaults['replace_with'])
+
         self.replace.setDisabled(True)
         self.replace.editingFinished.connect(self.check_search_and_replace_name)
         self.replace.setMaximumWidth(200)
@@ -268,30 +284,31 @@ class QuickRename(QWidget):
         rename_layout.addLayout(h_layout_3)
 
         h_layout_4 = QHBoxLayout()
-        self.renumber = QCheckBox("Renumber")
+
         self.renumber.setToolTip("When checked add renumbering to the selected items.\n"
                                  "Drag and Drop the selected items in the order you want the renumbering to happen.")
         self.renumber.clicked.connect(self.toggle_renumber)
+
         start_label = QLabel("Starting Number:")
-        self.start_num = QSpinBox()
         self.start_num.setToolTip("Set the start number for the renaming utilize")
         self.start_num.setDisabled(True)
         self.start_num.setValue(1)
         self.start_num.setMinimumWidth(50)
+
         label = QLabel("Padding:")
         padding_list = [str(x) for x in range(10)]
-        self.padding = QComboBox()
         self.padding.setToolTip("Set the padding to apply to the renumbering")
         self.padding.setDisabled(True)
         self.padding.addItems(padding_list)
         self.padding.setCurrentIndex(4)
         self.padding.setMinimumWidth(50)
-        self.dot = QCheckBox("Use Dot numbering")
+
         self.dot.setToolTip("Use a dot notation when numbering/\nExample: name.001.ext")
         self.dot.setDisabled(True)
         self.dot.setChecked(True)
         self.dot.setMinimumWidth(200)
         self.dot.setMaximumWidth(200)
+
         h_layout_4.addWidget(self.renumber)
         h_layout_4.addStretch(1)
         h_layout_4.addWidget(start_label)
@@ -304,21 +321,21 @@ class QuickRename(QWidget):
         rename_layout.addLayout(h_layout_4)
 
         h_layout_5 = QHBoxLayout()
-        self.ext = QCheckBox("Remove Extension")
+
         self.ext.setToolTip("Remove the extension when renaming."
                             "\nThis is useful if you have an incorrect ext applied.")
         h_layout_5.addWidget(self.ext)
         rename_layout.addLayout(h_layout_5)
         rename_layout.addSpacerItem(QSpacerItem(25, 25))
         h_layout_6 = QHBoxLayout()
-        self.backup_files = QCheckBox("Backup Files")
+
         self.backup_files.setToolTip("Create a backup of the files before renaming")
         self.backup_files.setChecked(True)
-        self.preview_button = QPushButton("Preview")
+
         self.preview_button.setToolTip("When pressed show a preview of what the end result of the renaming "
                                        "will look like")
         self.preview_button.clicked.connect(self.preview)
-        self.rename_button = QPushButton("Rename")
+
         self.rename_button.clicked.connect(self.launch_rename)
         h_layout_6.addWidget(self.backup_files)
         h_layout_6.addStretch(1)
@@ -403,7 +420,7 @@ class QuickRename(QWidget):
         self.setWindowIcon(QIcon('images/quick_rename_icon.png'))
 
         self.add_folder_ui_elements()
-        self.add_display_otions_ui_elements()
+        self.add_display_options_ui_elements()
         self.add_file_list_ui_elements()
         self.add_rename_options_ui_elements()
         self.main_layout.addLayout(self.file_view)
@@ -614,7 +631,7 @@ class QuickRename(QWidget):
                 if not os.path.isdir(temp_path):
                     # CONSTRUCT A WIDGET ITEM THAT IS CHECKABLE
                     item = QStandardItem(cur_file)
-                    item.setFlags(item.flags()|QtCore.Qt.ItemIsUserCheckable)
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable)
                     item.setCheckState(QtCore.Qt.Unchecked)
                     # CHECK TO SEE IF THE USER IS TRYING TO LIMIT THE FILE TYPE THEY WANT TO SHOW
                     if parse:
@@ -877,7 +894,7 @@ class QuickRename(QWidget):
 
 
 # MAIN PROGRAM
-if __name__ == '__main__' :
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     gui = QuickRename()
     sys.exit(app.exec_())
