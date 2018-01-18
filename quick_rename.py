@@ -49,7 +49,7 @@ class CustomTable(QTableView):
     where the dragged item originates from.
     """
     def __init__(self):
-        super().__init__()
+        super(QTableView, self).__init__()
 
         self.model = QStandardItemModel(1, 2)
         self.setModel(self.model)
@@ -110,7 +110,7 @@ class CustomTable(QTableView):
 class QuickRename(QWidget):
 
     def __init__(self):
-        super().__init__()
+        super(QWidget, self).__init__()
 
         # CREATE A DICTIONARY OF DEFAULT VALUES
         self._defaults = dict(
